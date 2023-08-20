@@ -32,3 +32,5 @@ jobs:
         with:
           github_token: ${{ secrets.TOKEN }}
           publish_dir: ./published-app/wwwroot
+          
+          
