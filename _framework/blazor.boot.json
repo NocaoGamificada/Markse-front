@@ -78,16 +78,16 @@
       "System.Xml.Linq.dll": "sha256-KM6fg8NsXjq010FfHOLUOF72ocEF5hm9iORM2hGHMQc=",
       "System.Xml.ReaderWriter.dll": "sha256-TLhorzxZugrbx6KOzEuXyPtzImJmBEc5FJeWmUGGoho=",
       "System.Xml.XDocument.dll": "sha256-08hPPk8SPS3Il4cLmuRIlE\/82N0nan4r7CJHGwLch\/0=",
-      "WalliFront.dll": "sha256-wAN65RYDzgapSaWnPwWuqonu9FgHlDiOhUQh8i2Rmx0="
+      "WalliFront.dll": "sha256-Hqy43NHIDmL2vEMPLuqvCKFoLiztZ8pGu9XtmmUA5qk="
     },
     "extensions": null,
     "lazyAssembly": null,
     "libraryInitializers": null,
     "pdb": null,
     "runtime": {
-      "dotnet.7.0.9.p9mnlp1hav.js": "sha256-WC9cJqd9+3vBAiQdvTWCV22wV+jNFcoTEyaGQRv9SUU=",
+      "dotnet.7.0.9.p9mnlp1hav.js": "sha256-L5EAISlFdkp\/ZpaUkocLnc9Nj7HL36aB\/u5ZMYb40tI=",
       "dotnet.timezones.blat": "sha256-dKqztlnWPN3rvLJRCI444rLYX55dtIQt\/DQkFslO+z4=",
-      "dotnet.wasm": "sha256-BYs7X6UzBbUj7oHJQATeCLSq\/nf50J9RDJFCvgqXySU=",
+      "dotnet.wasm": "sha256-MsgTiYfrGvypxvqvIL+DWMS6B++12RqPZPe8G77\/PZE=",
       "icudt.dat": "sha256-tO5O5YzMTVSaKBboxAqezOQL9ewmupzV2JrB5Rkc8a4=",
       "icudt_CJK.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
       "icudt_EFIGS.dat": "sha256-8fItetYY8kQ0ww6oxwTLiT3oXlBwHKumbeP2pRF4yTc=",
@@ -96,7 +96,7 @@
     "runtimeAssets": {
       "dotnet.wasm": {
         "behavior": "dotnetwasm",
-        "hash": "sha256-BYs7X6UzBbUj7oHJQATeCLSq\/nf50J9RDJFCvgqXySU="
+        "hash": "sha256-MsgTiYfrGvypxvqvIL+DWMS6B++12RqPZPe8G77\/PZE="
       }
     },
     "satelliteResources": null

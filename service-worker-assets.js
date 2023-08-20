@@ -25,7 +25,7 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-dJxYVmrjqGjJdl1\/gTKzCdAxoASR3\/TjeV0g74sMPjQ=",
+      "hash": "sha256-n\/QB0KoJAb8bMYiQs2I7gk7jCnq9X\/nFVTDiSoCn6rY=",
       "url": "_framework\/blazor.boot.json"
     },
     {
@@ -313,15 +313,15 @@
       "url": "_framework\/System.Xml.XDocument.dll"
     },
     {
-      "hash": "sha256-wAN65RYDzgapSaWnPwWuqonu9FgHlDiOhUQh8i2Rmx0=",
+      "hash": "sha256-Hqy43NHIDmL2vEMPLuqvCKFoLiztZ8pGu9XtmmUA5qk=",
       "url": "_framework\/WalliFront.dll"
     },
     {
-      "hash": "sha256-WC9cJqd9+3vBAiQdvTWCV22wV+jNFcoTEyaGQRv9SUU=",
+      "hash": "sha256-L5EAISlFdkp\/ZpaUkocLnc9Nj7HL36aB\/u5ZMYb40tI=",
       "url": "_framework\/dotnet.7.0.9.p9mnlp1hav.js"
     },
     {
-      "hash": "sha256-BYs7X6UzBbUj7oHJQATeCLSq\/nf50J9RDJFCvgqXySU=",
+      "hash": "sha256-MsgTiYfrGvypxvqvIL+DWMS6B++12RqPZPe8G77\/PZE=",
       "url": "_framework\/dotnet.wasm"
     },
     {
@@ -501,7 +501,7 @@
       "url": "images\/walli_logo.png"
     },
     {
-      "hash": "sha256-uGAon0v9Iuk5GMyLYPyZ76VwtXSeZi23IavsKgM2AVs=",
+      "hash": "sha256-MLuSK59c4sjIpJKJAugWCvnBn\/3cya0jz8DXbEewp3I=",
       "url": "index.html"
     },
     {
@@ -521,5 +521,5 @@
       "url": "sample-data\/weather.json"
     }
   ],
-  "version": "sGHwoPvV"
+  "version": "3CCjbm6p"
 };
