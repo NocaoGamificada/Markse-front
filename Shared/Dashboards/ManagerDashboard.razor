@@ -1,0 +1,76 @@
+﻿@inject NavigationStacker navManager;
+@inject Api api;
+@inject LocalStorage localStorage;
+
+<div class="flex w-full pt-2 flex-col gap-3 items-center md:items-center">
+    <div class="w-full rounded-3xl px-3 py-8 flex flex-row items-center justify-center bg-[rgba(22,22,22,255)] md:max-w-[300px]">
+        @if (countResult != null)
+        {
+            <div class="w-[40%] flex flex-col items-center justify-center md:w-auto md:flex-1">
+                <h1 class="text-white text-center font-bold">Buscas Realizadas</h1>
+                <h2 class="text-green-400">@countResult</h2>
+            </div>
+        }
+        else
+        {
+            <div class="w-[40%] flex flex-col items-center justify-center md:w-auto md:flex-1">
+                <ButtonStyled>Tentar novamente</ButtonStyled>
+            </div>
+        }
+    </div>
+
+    @if (homeData != null)
+    {
+        <div class="flex h-fit flex-col md:flex-row md:w-[90%] mt-3 py-2">
+            <div class="flex flex-col gap-2 w-full md:w-[45%]">
+                <LabelRounded Value="@homeData.TotalFranqueds.ToString()">Total de Franqueados</LabelRounded>
+                <LabelRounded Value="@homeData.TotalSellers.ToString()">Total de Vendedores</LabelRounded>
+                <LabelRounded Value="@homeData.TotalClients.ToString()">Total de Clientes</LabelRounded>
+                <LabelRounded Value="@homeData.TotalMarks.ToString()">Total de Marcas</LabelRounded>
+            </div>
+            <div class="w-full flex justify-center items-center md:flex-1 flex-col gap-5">
+                <BoxPercent />
+                <BoxPercent />
+            </div>
+        </div>
+    }
+    else if (LoadingHomeData)
+    {
+        <div class="w-full mt-5 flex justify-center">
+            <Loading />
+        </div>
+    }
+</div>
+
+@code {
+    DropDownDashboard? dropDown;
+
+    HomeData? homeData;
+    bool LoadingHomeData = true;
+
+    int? countResult = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var _res = await api.Get(api.walliManager.getResultCount, await api.GetLoginHeader());
+        if (_res?.IsSuccessStatusCode == true)
+            countResult = int.Parse(await _res.Content.ReadAsStringAsync());
+
+        var json = await localStorage.GetInSession("managerDataIndex");
+        if (!string.IsNullOrEmpty(json))
+        {
+            homeData = JsonSerializer.Deserialize<HomeData>(json);
+            return;
+        }
+
+        homeData = await api.GetJson<HomeData>(api.walliManager.getHomeDate, await api.GetLoginHeader());
+        LoadingHomeData = false;
+    }
+
+    async Task ViewMark(ClientMark mark)
+    {
+        navManager.NavigateTo("/viewMark", true);
+    }
+
+    void CreateNewMark() => navManager.NavigateTo("/novamarca", true);
+}

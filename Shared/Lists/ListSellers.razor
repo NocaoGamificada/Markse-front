@@ -1,0 +1,132 @@
+﻿@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using System.Diagnostics.CodeAnalysis;
+@inject Api api;
+@inject LocalStorage localStorage;
+
+@if (!loading)
+{
+    @if (sellerResults == null || sellerResults?.Sellers.Length == 0)
+    {
+        <div class="text-white text-2xl font-bold w-full text-center">
+            Sem resultados encontrados!
+        </div>
+    }
+    else
+    {
+        <ListDefaultTable>
+            <HeaderContent>
+                <td align="center" width="150px" class="text-white">Nome</td>
+                <td align="center" width="200px" class="text-white">Email</td>
+                <td align="center" width="200px" class="text-white">CPF</td>
+            </HeaderContent>
+            <PaginationContent>
+                <Pagination @ref=pagination CountPages="sellerResults?.CountPages ?? 1" UpdateResults="UpdateResults" />
+            </PaginationContent>
+
+            <ChildContent>
+                @foreach (var user in sellerResults.Sellers)
+                {
+                    <SellerLine Id="user.Id">
+                        <Name>@user.Name</Name>
+                        <Email>@user.Email</Email>
+                        <Cpf>@user.Indentification</Cpf>
+                    </SellerLine>
+                }
+            </ChildContent>
+        </ListDefaultTable>
+    }
+}
+else
+{
+    <div class="w-full flex items-center justify-center">
+        <Loading />
+    </div>
+}
+
+@code {
+    private Pagination pagination;
+    private int currentPage { get => pagination == null ? 1 : pagination.currentPage; }
+    private bool loading = true;
+    private SellerResults sellerResults;
+    string loggedRole = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var rolesJson = await localStorage.Get("roles");
+        loggedRole = JsonSerializer.Deserialize<string[]>(rolesJson)?.FirstOrDefault() ?? "";
+        await UpdateResults();
+    }
+
+    async Task UpdateResults()
+    {
+        string url = GetUrl();
+
+        if (url == "")
+        {
+            return;
+        }
+
+        loading = true;
+        StateHasChanged();
+
+        var res = await api.Get(url + $"?page={currentPage}", await api.GetLoginHeader());
+        if (res?.IsSuccessStatusCode == true)
+        {
+            var json = await res.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(json))
+            {
+                sellerResults = new()
+                {
+                    CountPages = 1,
+                    Sellers = Array.Empty<User>()
+                };
+            }
+            else
+            {
+                sellerResults = JsonSerializer.Deserialize<SellerResults>(json);
+            }
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    public MarkupString GetUserStatus(User u)
+    {
+        if (!u.Status)
+        {
+            return new MarkupString("<span class=\"text-red-600\">Inativo</span>");
+        }
+        else
+        {
+            return new MarkupString("<span class=\"text-green-600\">Ativo</span>");
+        }
+    }
+
+    string GetUrl()
+    {
+        if (loggedRole == "walli_franqued")
+        {
+            return api.walliFranqued.getSellers;
+        }
+        else if (loggedRole == "master")
+        {
+            return api.walliManager.getSellers;
+        }
+
+        return "";
+    }
+
+    public class SellerResults
+    {
+        [JsonPropertyName("sellers")]
+        public User[] Sellers { get; set; } = default!;
+
+        [JsonPropertyName("countPages")]
+        public int CountPages { get; set; }
+    }
+}

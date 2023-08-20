@@ -1,0 +1,65 @@
+﻿@page "/viewMark/{MarkId:int}";
+@inject Api api;
+@inject LocalStorage localStorage;
+@inject NavigationStacker navManager;
+
+<div class="w-full h-fit h-full bg-zinc-800 flex flex-col overflow-y-auto">
+    <MarkseHeader>
+        <ButtonCustom>Nova Marca</ButtonCustom>
+    </MarkseHeader>
+    @if (loading)
+    {
+        <div class="w-full h-full flex flex-col items-center justify-center">
+            <Loading />
+        </div>
+    }
+    else
+    {
+        if (sucessful)
+        {
+            <div class="flex flex-col w-full p-4">
+                <MarkDashboard Mark="mark"/>
+                <SearchResults />
+            </div>
+
+            <ListResultsSpecify ClientMark="mark"></ListResultsSpecify>
+        }
+        else
+        {
+            <div class="w-full flex-1 flex justify-center items-center">
+                <div class="w-[70%] md:w-[50%]">
+                    <ButtonStyled OnClick="Update">Tentar novamente</ButtonStyled>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int MarkId { get; set; }
+    ClientMark? mark;
+
+    bool loading = true;
+    bool sucessful = false;
+    protected override async Task OnInitializedAsync()
+    {
+        await Update();
+    }
+
+    async Task Update()
+    {
+        loading = true;
+        StateHasChanged();
+        var res = await api.Get(api.walliClient.getMark + $"?markId={MarkId}", await api.GetLoginHeader());
+
+        sucessful = res?.IsSuccessStatusCode == true;
+        if (sucessful && res != null)
+        {
+            mark = JsonSerializer.Deserialize<ClientMark>(await res.Content.ReadAsStringAsync());
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+}

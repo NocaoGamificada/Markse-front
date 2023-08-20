@@ -1,0 +1,92 @@
+﻿@inject Api api;
+@inject LocalStorage localStorage;
+
+@if (loading)
+{
+    <div class="w-full flex flex-1 justify-center items-center">
+        <h1 class="text-3xl text-white">Loading....</h1>
+    </div>
+}
+else
+{
+    <div class="w-full h-fit flex flex-col gap-3">
+        <h1 class="font-bold text-2xl text-white">Resultados das buscas: </h1>
+        <div class="w-full flex flex-col items-center gap-3 md:flex-row md:flex-wrap md:items-start md:justify-center">
+            <PieChart Data=dataViolations Id="violation_canvas">VIOLAÇÕES DETECTADAS</PieChart>
+            <PieChart Data=dataGood Id="engage_ok">ENGAJAMENTO POSITIVO</PieChart>
+            <PieChart Data=dataBad Id="engage_bad">ENGAJAMENTO NEGATIVO</PieChart>
+        </div>
+    </div>
+}
+
+@code {
+    bool loading = true;
+    public int markId;
+    [Parameter]
+    public bool isHome { get; set; }
+    List<GraphicPie> graphicData;
+
+    PieData dataViolations = new();
+    PieData dataGood = new();
+    PieData dataBad = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (isHome)
+        {
+            await SetupHome();
+        }
+        else
+        {
+            var res = await api.Get(api.walliClient.getHomeGraphics, await api.GetLoginHeader());
+
+            if (res != null)
+            {
+                if (res.IsSuccessStatusCode)
+                {
+                    graphicData = JsonSerializer.Deserialize<List<GraphicPie>>(await res.Content.ReadAsStringAsync());
+                    SetupGraphic();
+                    loading = false;
+                }
+            }
+        }
+    }
+
+    async Task SetupHome()
+    {
+        var res = await api.Get(api.walliClient.getHomeGraphics, await api.GetLoginHeader());
+
+        if (res != null)
+        {
+            if (res.IsSuccessStatusCode)
+            {
+                graphicData = JsonSerializer.Deserialize<List<GraphicPie>>(await res.Content.ReadAsStringAsync());
+                SetupGraphic();
+                loading = false;
+            }
+        }
+    }
+
+    void SetupGraphic()
+    {
+        var violations = new Dictionary<string, int>();
+        var goods = new Dictionary<string, int>();
+        var bads = new Dictionary<string, int>();
+
+        graphicData.ForEach(g =>
+        {
+            violations.Add(g.Name, g.Violations);
+            goods.Add(g.Name, g.Good);
+            bads.Add(g.Name, g.Bad);
+        });
+
+        dataBad.data = bads.Values.ToArray();
+        dataBad.labels = bads.Keys.ToArray();
+
+        dataGood.data = goods.Values.ToArray();
+        dataGood.labels = goods.Keys.ToArray();
+
+        dataViolations.data = violations.Values.ToArray();
+        dataViolations.labels = violations.Keys.ToArray();
+    }
+}

@@ -1,0 +1,138 @@
+﻿@page "/planos";
+@inject IJSRuntime js;
+@layout NoAuthLayoutView;
+@inject Api api;
+@inject NavigationStacker navManager;
+@inject LocalStorage localStorage;
+
+<style>
+    .card-plan ul li {
+        list-style: disc;
+        width: 80%;
+        font-size: 10pt;
+        font-weight: 600;
+    }
+</style>
+
+<div style="background: rgb(26,24,97);background: linear-gradient(36deg, rgba(26,24,97,1) 0%, rgba(13,6,40,1) 28%, rgba(59,34,92,1) 100%);"
+    class="w-full min-h-screen overflow-y-auto gap-3 flex-col justify-center items-center">
+    @if (loading)
+    {
+        <div class="w-full h-screen flex justify-center items-center">
+            <div class="w-8 h-8 max-h-full">
+                <Loading />
+            </div>
+        </div>
+    }
+    else if (!haveError)
+    {
+        <div class="flex flex-col items-center py-4 w-full">
+            <img @onclick=@(async () => {
+                await navManager.NavigateTo("/");
+            }) src="images/walli_logo.png" class="w-[300px] object-contain cursor-pointer" />
+        </div>
+        @if (!Selected)
+        {
+            <div class="w-full flex flex-1">
+                <div class="w-[35%] flex flex-col justify-center font-semibold pl-8 gap-5">
+                    <h1 style="color: #e64bce;" class="text-5xl">Planos e<br> Preços</h1>
+                    <p class="text-white text-lg">Leve seu négocio para outro nível, com nosso plano premium que é feito pelos nossos especialistas</p>
+                </div>
+                <div class="flex-1 items-center gap-4 flex flex-col md:flex-row px-3 justify-center flex-1 pt-11">
+                    <PlanCard OnSelected=SelectedCard Level="1" IsActive=@(assinature?.Level == 1)>
+                        <CardTitle>Básico</CardTitle>
+                        <CardPrice>49,99</CardPrice>
+                        <CardVantagens>
+                            <li>Inteligencia Artificial Guardiã Dedicada</li>
+                            <li>Monitoramento de marca no Facebook, Instagram, Koo e Google</li>
+                            <li>Alertas por e-mail sobre menções negativas a marca</li>
+                            <li>Acesso ao painel de controle para visualizar dados de monitoramento</li>
+                        </CardVantagens>
+                    </PlanCard>
+
+                    <PlanCard OnSelected=SelectedCard Level="2" Destaque=true IsActive=@(assinature?.Level == 2)>
+                        <CardTitle>Premium</CardTitle>
+                        <CardPrice>149,99</CardPrice>
+                        <CardVantagens>
+                            <li>Inteligencia Artificial Guardiã Dedicada</li>
+                            <li>Monitoramento de marca em 10 plataformas sociais</li>
+                            <li>Alertas por e-mail e sms sobre menções negativas a marca</li>
+                            <li>Acesso ao painel de controle para visualizar dados de monitoramento</li>
+                        </CardVantagens>
+                    </PlanCard>
+                </div>
+            </div>
+        }
+        else
+        {
+            <PaymentSelect LevelSelected="levelSelected"></PaymentSelect>
+        }
+    }
+    else
+    {
+        <div class="w-full h-full flex justify-center items-center">
+            <div class="w-[50%]">
+                <ButtonStyled OnClick="OnInitializedAsync">Tentar novamente</ButtonStyled>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    Assinature? assinature;
+    bool Selected = false;
+    int levelSelected = 0;
+
+    bool loading = true;
+    bool haveError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        haveError = false;
+        StateHasChanged();
+
+        if (await localStorage.CheckAuthSession())
+        {
+            await GetCurrentAssinature();
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    public void SelectedCard(int level)
+    {
+        if (assinature == null)
+        {
+            navManager.NavigateTo("/login");
+            return;
+        }
+
+        levelSelected = level;
+        Selected = true;
+        StateHasChanged();
+    }
+
+    async Task GetCurrentAssinature()
+    {
+        var res = await api.Get(api.walliClient.getCurrentPlan, await api.GetLoginHeader());
+
+        if (res?.IsSuccessStatusCode != true)
+        {
+            MessageErrorResponse? objError = null;
+            try
+            {
+                if (res != null)
+                    objError = JsonSerializer.Deserialize<MessageErrorResponse>(await res.Content.ReadAsStringAsync());
+            }
+            catch(Exception){}
+
+            await js.InvokeVoidAsync("window.alert", objError?.MessageError ?? "Houve um erro inesperado ao carregar seu plano, porfavor tente novamente!");
+            haveError = true;
+            return;
+        }
+
+        assinature = JsonSerializer.Deserialize<Assinature>(await res.Content.ReadAsStringAsync());
+    }
+}

@@ -1,0 +1,12 @@
+<div class="w-full flex flex-row gap-2 pl-3 items-center">
+    <div style="background-color: @Color;" class="rounded-full w-2 h-2 md:w-3 md:h-3"/>
+    <h2 class="text-zinc-100 text-md">@ChildContent</h2>
+</div>
+
+@code{
+    [Parameter]
+    public string Color { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

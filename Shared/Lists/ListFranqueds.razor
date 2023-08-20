@@ -1,0 +1,75 @@
+﻿@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using System.Diagnostics.CodeAnalysis;
+@inject Api api;
+@inject LocalStorage localStorage;
+
+@if (!loading)
+{
+    <ListDefaultTable>
+        <HeaderContent>
+            <th class="text-white">Nome</th>
+            <th class="text-white">Email</th>
+            <th class="text-white">CPF</th>
+        </HeaderContent>
+        <ChildContent>
+            @if (franquedResults != null)
+                @foreach (var f in franquedResults.Franqueds)
+                {
+                    <FranquedLine>
+                        <Name>@f.Name</Name>
+                        <Email>@f.Email</Email>
+                        <Cpf>@f.Indentification</Cpf>
+                    </FranquedLine>
+                }
+        </ChildContent>
+        <PaginationContent>
+            <Pagination @ref=pagination CountPages="franquedResults?.CountPages ?? 0" UpdateResults="UpdateResults" />
+        </PaginationContent>
+    </ListDefaultTable>
+}
+else
+{
+    <div class="w-full flex items-center justify-center">
+        <Loading />
+    </div>
+}
+
+@code{
+    private Pagination? pagination;
+    private int currentPage { get => pagination == null ? 1 : pagination.currentPage; }
+    private bool loading = true;
+    private FranquedResults? franquedResults;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        await UpdateResults();
+    }
+
+    async Task UpdateResults()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var loginHeader = await api.GetLoginHeader();
+        var http = new HttpClient();
+
+        foreach (var h in loginHeader)
+            http.DefaultRequestHeaders.Add(h.Key, h.Value);
+
+        var res = await http.GetAsync($"{api.baseAddres}/{api.walliManager.getFranqueds}");
+
+        if (res?.IsSuccessStatusCode == true)
+        {
+            string json = await res.Content.ReadAsStringAsync();
+            franquedResults = JsonSerializer.Deserialize<FranquedResults>(json);
+            Console.WriteLine(json);
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+}

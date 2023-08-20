@@ -1,0 +1,28 @@
+﻿@page "/novamarca";
+@inject LocalStorage localStorage;
+
+@if (loggedRole == "master")
+{
+    <NewMarkManager />
+}
+else if (loggedRole == "walli_franqued")
+{
+    <NewMarkFranqued />
+}
+else if (loggedRole == "walli_seller")
+{
+    <NewClient />
+}
+else
+{
+    <NewMarkClient />
+}
+
+@code {
+    private string loggedRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        loggedRole = await localStorage.Get("loggedRole");
+    }
+}

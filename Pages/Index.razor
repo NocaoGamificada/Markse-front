@@ -1,0 +1,28 @@
+﻿@page "/index";
+@inject LocalStorage localStorage;
+
+@if (loggedRole == "master")
+{
+    <IndexManager />
+}
+else if (loggedRole == "walli_franqued")
+{
+    <IndexFranqued />
+}
+else if (loggedRole == "walli_seller")
+{
+    <IndexSeller />
+}
+else
+{
+    <IndexClient />
+}
+
+@code{
+    string loggedRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        loggedRole = await localStorage.GetLoggedRole();
+    }
+}

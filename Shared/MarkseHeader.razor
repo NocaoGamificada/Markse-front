@@ -1,0 +1,23 @@
+﻿@inject NavigationStacker navManager;
+
+<header class="w-full h-[60px] py-1 bg-zinc-600 flex flex-row gap-2 items-center justify-between md:h-[80px] md:px-12">
+    <img @onclick=@(async () => await navManager.NavigateTo("/", true)) tabindex="0" title="Logo da mark-se" src="images/walli_logo.png" class="object-contain cursor-pointer w-[150px] ml-3 h-full" />
+    <div class="w-[50%] flex flex-row md:w-[30%] justify-end">
+        <div class="w-[70%] py-5 px-2">
+            <ButtonStyled Color="text-zinc-900" FontSize="text-[8pt]" OnClick="Click">Fale pelo chat</ButtonStyled>
+        </div>
+    </div>
+</header>
+
+@code{
+    [Parameter]
+    public RenderFragment? ButtonCustom { get; set; }
+
+    [Parameter]
+    public string TargetRoute { get; set; } = "/novamarca";
+
+    public async void Click()
+    {
+        await navManager.NavigateTo("/chat", false);
+    }
+}

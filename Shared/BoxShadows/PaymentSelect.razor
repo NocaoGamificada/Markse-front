@@ -1,0 +1,121 @@
+﻿@inject Api api;
+@inject IJSRuntime js;
+@inject NavigationStacker navManager;
+
+<div class="flex flex-1 w-full flex-col">
+    <div class="w-full py-4 flex flex-col items-center text-2xl text-white font-semibold">
+        @if (LevelSelected == 1)
+        {
+            <h1>Plano Selecionado: Basico</h1>
+        }
+        else
+        {
+            <h1>Plano Selecionado: Premium</h1>
+        }
+    </div>
+
+    @if (!paymenting)
+    {
+        if (!SelecionouCartao && !SelecionouBoleto && !SelecionouPix)
+        {
+            <div class="flex justify-center items-center flex-col md:flex-row gap-4">
+                <div class="w-[40%] h-[130px] md:w-[20%]">
+                    <img @onclick=@(() => SelectedMethod("boleto")) class="bg-white h-full object-contain p-3 rounded-xl w-full hover:scale-110 transaction-all duration-200 cursor-pointer" src="images/pagamento/boleto.png" />
+                </div>
+                <div class="w-[40%] h-[130px] md:w-[20%]">
+                    <img @onclick=@(() => SelectedMethod("credit_card")) class="bg-white h-full object-contain p-3 rounded-xl w-full hover:scale-110 transaction-all duration-200 cursor-pointer" src="images/pagamento/cartao.png" />
+                </div>
+                <div class="w-[40%] max-h-[130px] md:w-[20%]">
+                    <img @onclick=@(() => SelectedMethod("pix")) class="bg-white h-full object-contain p-3 rounded-xl w-full hover:scale-110 transaction-all duration-200 cursor-pointer" src="images/pagamento/pix.png" />
+                </div>
+            </div>
+        }
+        else if (SelecionouCartao)
+        {
+            <div class="pl-2">
+                <button @onclick=@(() => {
+                    SelecionouCartao = false;
+                    StateHasChanged();
+                }) class="w-[125px] py-2 pl-2 bg-green-400 rounded-xl px-2">Voltar</button>
+            </div>
+            <ListCreditCardsPayment onSelected="SelectCreditCard" />
+        }
+        else if (SelecionouBoleto)
+        {
+            <div class="pl-2">
+                <button @onclick=@(() => {
+                SelecionouBoleto = false;
+                StateHasChanged();
+                }) class="w-[125px] py-2 pl-2 bg-green-400 rounded-xl px-2">
+                    Voltar
+                </button>
+            </div>
+            <PaymentBoleto Level="LevelSelected"></PaymentBoleto>
+        }
+        else
+        {
+            <PaymentPix PaymentSelect="this"/>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int LevelSelected { get; set; }
+
+    bool SelecionouCartao { get; set; }
+    bool SelecionouBoleto { get; set; }
+    bool SelecionouPix { get; set; }
+
+    public Action? Return { get; set; }
+
+    bool paymenting = false;
+    bool sucessfull = false;
+    string method = string.Empty;
+
+    private int creditCardId = 0;
+
+    protected override void OnInitialized()
+    {
+        if (LevelSelected != 1 || LevelSelected != 2)
+        {
+            Return?.Invoke();
+        }
+    }
+
+    public async Task SelectedMethod(string method)
+    {
+        this.method = method;
+
+        if (method == "credit_card")
+        {
+            SelecionouCartao = true;
+            StateHasChanged();
+            return;
+        }
+        else if (method== "boleto")
+        {
+            SelecionouBoleto = true;
+            StateHasChanged();
+            return;
+        }
+        else if (method == "pix")
+        {
+            SelecionouPix = true;
+            StateHasChanged();
+            return;
+        }
+    }
+
+    public async Task SelectCreditCard(int cardId)
+    {
+        creditCardId = cardId;
+        var res = await api.Post(api.walliClient.buyPlan + $"?level={LevelSelected}&payment_type={method}&creditCardId={creditCardId}", "", await api.GetLoginHeader());
+
+        if (res?.IsSuccessStatusCode == true)
+        {
+            await js.InvokeVoidAsync("window.alert", "Você comprou o plano com sucesso :D");
+            await navManager.NavigateTo("/perfil", true);
+        }
+    }
+}

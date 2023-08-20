@@ -1,0 +1,16 @@
+﻿<LineTable>
+    <td class="text-white">@Name</td>
+    <td class="text-white">@Email</td>
+    <td class="text-white">@Cpf</td>
+</LineTable>
+
+@code {
+    [Parameter]
+    public RenderFragment Name { get; set; }
+
+    [Parameter]
+    public RenderFragment Email { get; set; }
+
+    [Parameter]
+    public RenderFragment Cpf { get; set; }
+}

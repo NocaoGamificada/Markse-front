@@ -1,0 +1,20 @@
+﻿<div class="w-full h-full bg-zinc-800 overflow-y-auto">
+    <MarkseHeader>
+        <ButtonCustom>Nova Marca</ButtonCustom>
+    </MarkseHeader>
+    <div class="flex flex-col w-full p-4">
+        <MarksDashboard OnDelete="OnDelete" />
+        <SearchResults isHome=true />
+    </div>
+
+    <ListResults @ref=listResults IsEspecificy=false ClientMark="null" />
+</div>
+
+@code {
+    ListResults listResults;
+
+    public void OnDelete()
+    {
+        var _ = listResults.CheckSpecify();
+    }
+}

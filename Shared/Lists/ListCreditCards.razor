@@ -1,0 +1,30 @@
+﻿@inject NavigationStacker navManager;
+@inject Api api;
+
+<div class="text-lg text-white py-2 font-bold">Seus cartões: </div>
+<div class="w-full px-2 py-3 flex flex-col gap-2">
+    @if (Cards != null)
+        @foreach (var creditNumber in Cards)
+        {
+            <h1 class="text-zinc-200 text-sm">@creditNumber.CardNumber</h1>
+        }
+    <div class="w-[200px] py-3">
+        <ButtonStyled OnClick=@(() => navManager.NavigateTo("/adicionar-cartão", true))>Adicionar Cartão</ButtonStyled>
+    </div>
+</div>
+
+@code {
+    public bool loadingCards = true;
+
+    [Parameter]
+    public List<Card>? Cards { get; set; } = null;
+
+    public class Card
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("cardNumber")]
+        public string CardNumber { get; set; } = string.Empty;
+    }
+}

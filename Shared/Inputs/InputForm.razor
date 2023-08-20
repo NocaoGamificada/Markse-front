@@ -1,0 +1,50 @@
+﻿@using System.Diagnostics.CodeAnalysis;
+@inject IJSRuntime js;
+
+<div class="w-full py-2 px-3 flex flex-col items-start gap-1 mb-auto-1.5">
+    @if (ChildContent != null)
+    {
+        <label class="text-sm text-white" for="@Id">@ChildContent</label>
+    }
+    <div class="w-full p-0 flex flex-row items-center gap-2">
+        <input id="@Id" @onkeyup=@((e) => KeyboardEvent?.Invoke(e)) name="@Id" placeholder="@Placeholder" @bind=Data.Value type=@Type
+               class="shadow outline-0 border-0 bg-zinc-700 border rounded-2xl flex-1 py-2 px-3 text-zinc-200 leading-tight focus:outline-none focus:shadow-outline" />
+        <div class="ml-3">
+            @FrontInput
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    [Parameter]
+    public string? Mask { get; set; } = null;
+
+    [Parameter]
+    public InputData Data { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = string.Empty;
+
+    [Parameter, AllowNull]
+    public Action<KeyboardEventArgs> KeyboardEvent { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment FrontInput { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Mask != null && firstRender)
+        {
+            await js.InvokeVoidAsync("maskInput", Id, Mask, new { placeholder = Placeholder });
+        }
+    }
+}
